@@ -39,19 +39,14 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
 
     result.fold(
       (Failure failure) {
-        // Only show error if we truly have no data (no cache available)
-        // The repository will return cached data in Right() if available, so
-        // if we're here, there's no cached data either
         emit(state.copyWith(isLoading: false, errorMessage: failure.message));
       },
       (List<CharacterEntity> characters) {
-        // If we got data (even from cache), show it without error
         emit(
           state.copyWith(
             isLoading: false,
             characters: characters,
             currentPage: 1,
-            // When offline, we get all cached data at once, so hasMore is false
             hasMore: characters.length >= _pageSize && characters.isNotEmpty,
             errorMessage: null,
           ),
@@ -70,19 +65,16 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
 
     result.fold(
       (Failure failure) {
-        // When offline, page > 1 will fail, but that's expected
-        // Just stop loading more and don't show error
         emit(
           state.copyWith(
             isLoadingMore: false,
             hasMore: false,
-            errorMessage: null, // Don't show error for offline pagination
+            errorMessage: null,
           ),
         );
       },
       (List<CharacterEntity> characters) {
         if (characters.isEmpty) {
-          // Empty list when offline means no more cached data available
           emit(state.copyWith(isLoadingMore: false, hasMore: false));
           return;
         }

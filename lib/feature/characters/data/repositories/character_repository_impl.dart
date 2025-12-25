@@ -17,7 +17,6 @@ class CharacterRepositoryImpl extends CharacterRepository {
   @override
   Future<Either<Failure, List<CharacterEntity>>> getCharacter(int page) async {
     try {
-      // Preserve existing favourites before updating
       final existing = await db.getAllCharacters();
       final favMap = {for (final row in existing) row.id: row.isFavorite};
 
